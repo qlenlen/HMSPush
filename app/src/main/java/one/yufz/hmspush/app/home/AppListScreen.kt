@@ -48,19 +48,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import one.yufz.hmspush.BuildConfig
 import one.yufz.hmspush.R
 import one.yufz.hmspush.app.HmsPushClient
-import one.yufz.hmspush.app.fake.FakeDeviceConfig
-import one.yufz.hmspush.app.theme.AppTheme
 import one.yufz.hmspush.app.theme.customColors
 import one.yufz.hmspush.common.HMS_PACKAGE_NAME
 import one.yufz.hmspush.common.HmsCoreUtil
@@ -74,30 +69,30 @@ fun AppListScreen(searchText: String, appListViewModel: AppListViewModel = viewM
 
     appListViewModel.filter(searchText)
 
-    AppList(appList)
+    AppList(appList, appListViewModel)
 }
 
 @Composable
-private fun AppList(appList: List<AppInfo>) {
+private fun AppList(appList: List<AppInfo>, vm: AppListViewModel) {
     val bottomPadding = WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom).asPaddingValues()
     LazyColumn(contentPadding = bottomPadding) {
         items(
             items = appList,
             key = { it.packageName }
         ) {
-            AppCard(it)
+            AppCard(it, vm)
         }
     }
 }
 
 @Composable
-private fun AppCard(info: AppInfo) {
+private fun AppCard(info: AppInfo, vm: AppListViewModel) {
     val drawable by loadAppIcon(LocalContext.current, info.packageName)
     val drawablePainter = rememberDrawablePainter(drawable)
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 8.dp, top = 8.dp, end = 4.dp, bottom = 8.dp)
+          .fillMaxWidth()
+          .padding(start = 8.dp, top = 8.dp, end = 4.dp, bottom = 8.dp)
     ) {
 
         //Icon
@@ -106,8 +101,8 @@ private fun AppCard(info: AppInfo) {
             contentDescription = "icon",
             tint = Color.Unspecified,
             modifier = Modifier
-                .size(56.dp)
-                .padding(all = 8.dp)
+              .size(56.dp)
+              .padding(all = 8.dp)
         )
         Spacer(modifier = Modifier.width(8.dp))
         Column(Modifier.weight(1f)) {
@@ -141,7 +136,7 @@ private fun AppCard(info: AppInfo) {
         var showDropdownMenu by remember { mutableStateOf(false) }
         IconButton(onClick = { showDropdownMenu = true }) {
             Icon(imageVector = Icons.Filled.MoreVert, contentDescription = "More")
-            MoreDropdownMenu(showDropdownMenu, info) { showDropdownMenu = false }
+            MoreDropdownMenu(showDropdownMenu, info, vm) { showDropdownMenu = false }
         }
 
     }
@@ -155,8 +150,8 @@ private fun FakeDeviceStatus(app: AppInfo) {
             color = MaterialTheme.colorScheme.contentColorFor(MaterialTheme.colorScheme.surfaceVariant),
             style = MaterialTheme.typography.labelSmall,
             modifier = Modifier
-                .background(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.shapes.small)
-                .padding(horizontal = 8.dp, vertical = 4.dp)
+              .background(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.shapes.small)
+              .padding(horizontal = 8.dp, vertical = 4.dp)
         )
     }
 }
@@ -206,7 +201,12 @@ private fun AppStatus(info: AppInfo) {
 }
 
 @Composable
-private fun MoreDropdownMenu(expanded: Boolean, info: AppInfo, onDismissRequest: () -> Unit) {
+private fun MoreDropdownMenu(
+    expanded: Boolean,
+    info: AppInfo,
+    vm: AppListViewModel,
+    onDismissRequest: () -> Unit
+) {
     val context = LocalContext.current
 
     var showUnregisterDialog by remember { mutableStateOf(false) }
@@ -267,9 +267,7 @@ private fun MoreDropdownMenu(expanded: Boolean, info: AppInfo, onDismissRequest:
                 },
                 onClick = {
                     onDismissRequest()
-                    GlobalScope.launch {
-                        FakeDeviceConfig.deleteConfig(info.packageName)
-                    }
+                    vm.modDeviceConfig(info.packageName, false)
                 }
             )
         } else {
@@ -279,9 +277,7 @@ private fun MoreDropdownMenu(expanded: Boolean, info: AppInfo, onDismissRequest:
                 },
                 onClick = {
                     onDismissRequest()
-                    GlobalScope.launch {
-                        FakeDeviceConfig.update(info.packageName, emptyList())
-                    }
+                    vm.modDeviceConfig(info.packageName, true)
                 }
             )
         }
@@ -306,7 +302,8 @@ private fun MoreDropdownMenu(expanded: Boolean, info: AppInfo, onDismissRequest:
             info = info,
             onDismissRequest = {
                 showUnregisterDialog = false
-            }
+            },
+            vm
         )
     }
 }
@@ -315,7 +312,7 @@ private fun MoreDropdownMenu(expanded: Boolean, info: AppInfo, onDismissRequest:
 private fun UnregisterDialog(
     info: AppInfo,
     onDismissRequest: () -> Unit,
-    viewModel: AppListViewModel = viewModel()
+    viewModel: AppListViewModel
 ) {
     AlertDialog(
         onDismissRequest = onDismissRequest,
@@ -342,20 +339,4 @@ private fun UnregisterDialog(
             }
         }
     )
-}
-
-
-@Preview
-@Composable
-private fun Preview() {
-    val appInfo = AppInfo(
-        packageName = BuildConfig.APPLICATION_ID,
-        lastPushTime = System.currentTimeMillis(),
-        name = stringResource(R.string.app_name),
-        registered = true
-    )
-    val list = listOf(appInfo, appInfo.copy(registered = false))
-    AppTheme {
-        AppList(list)
-    }
 }

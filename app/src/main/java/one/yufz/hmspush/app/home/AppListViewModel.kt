@@ -40,6 +40,16 @@ class AppListViewModel(val context: Application) : AndroidViewModel(context) {
         }
     }
 
+    fun modDeviceConfig(packageName: String, isAdd: Boolean) {
+        viewModelScope.launch {
+            if (isAdd) {
+                FakeDeviceConfig.update(packageName, emptyList())
+            } else {
+                FakeDeviceConfig.deleteConfig(packageName)
+            }
+        }
+    }
+
     private fun filterAppList(list: List<AppInfo>, keywords: String): List<AppInfo> {
         if (keywords.isEmpty()) return list
 
