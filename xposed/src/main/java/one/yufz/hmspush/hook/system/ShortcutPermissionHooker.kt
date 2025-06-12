@@ -3,6 +3,7 @@ package one.yufz.hmspush.hook.system
 import android.app.AndroidAppHelper
 import android.content.pm.ShortcutInfo
 import android.os.Binder
+import android.os.Build
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedHelpers.findMethodExact
 import one.yufz.hmspush.common.HMS_PACKAGE_NAME
@@ -11,7 +12,10 @@ import one.yufz.xposed.hook
 
 object ShortcutPermissionHooker {
     private fun fromHms() = try {
-        Binder.getCallingUid() == AndroidAppHelper.currentApplication().packageManager.getPackageUid(HMS_PACKAGE_NAME, 0)
+        Binder.getCallingUid() == AndroidAppHelper.currentApplication().packageManager.getPackageUid(
+            HMS_PACKAGE_NAME,
+            0
+        )
     } catch (e: Throwable) {
         false
     }
@@ -24,7 +28,10 @@ object ShortcutPermissionHooker {
         return false
     }
 
-    private fun hookPermission(targetPackageNameParamIndex: Int, hookExtra: (XC_MethodHook.MethodHookParam.() -> Unit)? = null): HookCallback = {
+    private fun hookPermission(
+        targetPackageNameParamIndex: Int,
+        hookExtra: (XC_MethodHook.MethodHookParam.() -> Unit)? = null
+    ): HookCallback = {
         doBefore {
             if (tryHookPermission(args[targetPackageNameParamIndex] as String)) {
                 hookExtra?.invoke(this)
@@ -34,15 +41,39 @@ object ShortcutPermissionHooker {
 
     fun hook(classShortcutService: Class<*>) {
         //    void pushDynamicShortcut(String packageName, in ShortcutInfo shortcut, int userId);
-        findMethodExact(classShortcutService, "pushDynamicShortcut", String::class.java, ShortcutInfo::class.java, Int::class.java)
+        findMethodExact(
+            classShortcutService,
+            "pushDynamicShortcut",
+            String::class.java,
+            ShortcutInfo::class.java,
+            Int::class.java
+        )
             .hook(hookPermission(0))
 
         //    int getMaxShortcutCountPerActivity(String packageName, int userId);
-        findMethodExact(classShortcutService, "getMaxShortcutCountPerActivity", String::class.java, Int::class.java)
+        findMethodExact(
+            classShortcutService,
+            "getMaxShortcutCountPerActivity",
+            String::class.java,
+            Int::class.java
+        )
             .hook(hookPermission(0))
 
         //    void verifyCaller(@NonNull String packageName, @UserIdInt int userId)
-        findMethodExact(classShortcutService, "verifyCaller", String::class.java, Int::class.java)
-            .hook(hookPermission(0))
+        if (Build.MANUFACTURER.equals(
+                "samsung",
+                ignoreCase = true
+            ) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM
+        ) {
+            // TODO: add new hook for Samsung
+        } else {
+            findMethodExact(
+                classShortcutService,
+                "verifyCaller",
+                String::class.java,
+                Int::class.java
+            )
+                .hook(hookPermission(0))
+        }
     }
 }
