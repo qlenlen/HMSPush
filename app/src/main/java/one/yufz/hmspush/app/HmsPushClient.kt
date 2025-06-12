@@ -1,6 +1,9 @@
 package one.yufz.hmspush.app
 
 import android.content.Context
+import java.lang.reflect.InvocationHandler
+import java.lang.reflect.Method
+import java.lang.reflect.Proxy
 import kotlinx.coroutines.flow.Flow
 import one.yufz.hmspush.common.BinderCursor
 import one.yufz.hmspush.common.BridgeUri
@@ -12,44 +15,44 @@ import one.yufz.hmspush.common.model.ModuleVersionModel
 import one.yufz.hmspush.common.model.PrefsModel
 import one.yufz.hmspush.common.model.PushHistoryModel
 import one.yufz.hmspush.common.model.PushSignModel
-import java.lang.reflect.InvocationHandler
-import java.lang.reflect.Method
-import java.lang.reflect.Proxy
 
-fun createHmsPushServiceProxy(context: Context): HmsPushInterface = Proxy.newProxyInstance(HmsPushInterface::class.java.classLoader, arrayOf(HmsPushInterface::class.java), object : InvocationHandler {
-    private lateinit var service: HmsPushInterface
+fun createHmsPushServiceProxy(context: Context): HmsPushInterface = Proxy.newProxyInstance(
+    HmsPushInterface::class.java.classLoader,
+    arrayOf(HmsPushInterface::class.java),
+    object : InvocationHandler {
+        private lateinit var service: HmsPushInterface
 
-    private fun getService(): HmsPushInterface {
-        if (this::service.isInitialized && service.asBinder().isBinderAlive) {
-            return service
+        private fun getService(): HmsPushInterface {
+            if (this::service.isInitialized && service.asBinder().isBinderAlive) {
+                return service
+            }
+            BridgeWrap.query(context, BridgeUri.HMS_PUSH_SERVICE.toUri())?.use {
+                service = HmsPushInterface.Stub.asInterface(BinderCursor.getBinder(it))
+                return service
+            }
+            return HmsPushInterface.Default()
         }
-        BridgeWrap.query(context, BridgeUri.HMS_PUSH_SERVICE.toUri())?.use {
-            service = HmsPushInterface.Stub.asInterface(BinderCursor.getBinder(it))
-            return service
-        }
-        return HmsPushInterface.Default()
-    }
 
-    override fun invoke(proxy: Any, method: Method, args: Array<out Any>?): Any? {
-        return try {
-            call(getService(), method, args)
-        } catch (t: Throwable) {
-            try {
+        override fun invoke(proxy: Any, method: Method, args: Array<out Any>?): Any? {
+            return try {
                 call(getService(), method, args)
-            } catch (e: Throwable) {
-                call(HmsPushInterface.Default(), method, args)
+            } catch (t: Throwable) {
+                try {
+                    call(getService(), method, args)
+                } catch (e: Throwable) {
+                    call(HmsPushInterface.Default(), method, args)
+                }
             }
         }
-    }
 
-    private fun call(obj: Any, method: Method, args: Array<out Any>?): Any? {
-        return if (args != null) {
-            method.invoke(obj, *args)
-        } else {
-            method.invoke(obj)
+        private fun call(obj: Any, method: Method, args: Array<out Any>?): Any? {
+            return if (args != null) {
+                method.invoke(obj, *args)
+            } else {
+                method.invoke(obj)
+            }
         }
-    }
-}) as HmsPushInterface
+    }) as HmsPushInterface
 
 object HmsPushClient : HmsPushInterface.Stub() {
     private val service = createHmsPushServiceProxy(App.instance)
@@ -61,7 +64,10 @@ object HmsPushClient : HmsPushInterface.Stub() {
         BridgeWrap.registerContentAsFlow(App.instance, BridgeUri.PUSH_SIGN.toUri()) { pushSignList }
 
     fun getPushHistoryFlow(): Flow<List<PushHistoryModel>> =
-        BridgeWrap.registerContentAsFlow(App.instance, BridgeUri.PUSH_HISTORY.toUri()) { pushHistoryList }
+        BridgeWrap.registerContentAsFlow(
+            App.instance,
+            BridgeUri.PUSH_HISTORY.toUri()
+        ) { pushHistoryList }
 
     fun isHmsPushServiceAlive(): Boolean {
         return moduleVersion != null

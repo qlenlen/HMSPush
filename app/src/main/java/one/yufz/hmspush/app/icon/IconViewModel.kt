@@ -3,6 +3,7 @@ package one.yufz.hmspush.app.icon
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import java.net.URL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,11 +16,11 @@ import one.yufz.hmspush.app.HmsPushClient
 import one.yufz.hmspush.common.IconData
 import org.json.JSONArray
 import org.json.JSONObject
-import java.net.URL
 
 class IconViewModel(val app: Application) : AndroidViewModel(app) {
     companion object {
-        const val ICON_URL = "https://raw.githubusercontent.com/fankes/AndroidNotifyIconAdapt/main/APP/NotifyIconsSupportConfig.json"
+        const val ICON_URL =
+            "https://raw.githubusercontent.com/fankes/AndroidNotifyIconAdapt/main/APP/NotifyIconsSupportConfig.json"
     }
 
     data class ImportState(val loading: Boolean, val info: String? = null)
@@ -34,7 +35,12 @@ class IconViewModel(val app: Application) : AndroidViewModel(app) {
     val iconsFlow: Flow<List<IconData>> = _iconsFlow.combine(filterKeywords) { list, keywords ->
         if (keywords.isEmpty()) return@combine list
 
-        list.filter { it.appName.contains(keywords, true) || it.packageName.contains(keywords, true) }
+        list.filter {
+            it.appName.contains(keywords, true) || it.packageName.contains(
+                keywords,
+                true
+            )
+        }
     }
 
     init {
@@ -54,7 +60,12 @@ class IconViewModel(val app: Application) : AndroidViewModel(app) {
                 return@launch
             }
 
-            _importState.emit(ImportState(false, getApplication<Application>().getString(R.string.import_complete)))
+            _importState.emit(
+                ImportState(
+                    false,
+                    getApplication<Application>().getString(R.string.import_complete)
+                )
+            )
 
             loadIcon()
         }

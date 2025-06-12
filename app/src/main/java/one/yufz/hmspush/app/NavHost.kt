@@ -16,7 +16,8 @@ import one.yufz.hmspush.app.home.HomeScreen
 import one.yufz.hmspush.app.icon.IconScreen
 import one.yufz.hmspush.app.settings.SettingsScreen
 
-val LocalNavHostController = staticCompositionLocalOf<NavHostController> { error("shouldn't happen") }
+val LocalNavHostController =
+    staticCompositionLocalOf<NavHostController> { error("shouldn't happen") }
 
 object Routers {
     const val FAKE_DEVICE = "fake_device"

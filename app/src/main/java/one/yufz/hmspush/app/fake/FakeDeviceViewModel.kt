@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import one.yufz.hmspush.app.hms.SupportHmsAppList
@@ -17,7 +16,12 @@ data class AppConfig(val name: String, val packageName: String, val enabled: Boo
 
 data class UIState(val configList: List<AppConfig>, val filterKeywords: String = "") {
     val filteredConfigList: List<AppConfig> = if (filterKeywords.isEmpty()) configList else
-        configList.filter { it.name.contains(filterKeywords, true) || it.packageName.contains(filterKeywords, true) }
+        configList.filter {
+            it.name.contains(filterKeywords, true) || it.packageName.contains(
+                filterKeywords,
+                true
+            )
+        }
 }
 
 class FakeDeviceViewModel(val app: Application) : AndroidViewModel(app) {
@@ -39,7 +43,11 @@ class FakeDeviceViewModel(val app: Application) : AndroidViewModel(app) {
         }
 
         viewModelScope.launch(Dispatchers.IO) {
-            combine(supportedAppList.appListFlow, fakeDeviceConfig.configMapFlow, ::mergeSource).collect { list ->
+            combine(
+                supportedAppList.appListFlow,
+                fakeDeviceConfig.configMapFlow,
+                ::mergeSource
+            ).collect { list ->
                 _uiState.update { old ->
                     val appConfigs = if (old.configList.isNotEmpty()) {
                         mergeConfigList(old.configList, list)
@@ -56,7 +64,10 @@ class FakeDeviceViewModel(val app: Application) : AndroidViewModel(app) {
     /**
      * Merge the current config list and the new config list with a stable order.
      */
-    private fun mergeConfigList(current: List<AppConfig>, newList: List<AppConfig>): List<AppConfig> {
+    private fun mergeConfigList(
+        current: List<AppConfig>,
+        newList: List<AppConfig>
+    ): List<AppConfig> {
         val newConfigMap = newList.associateBy { it.packageName }.toMutableMap()
         val merged = current.map { old ->
             newConfigMap.remove(old.packageName) ?: old
@@ -74,7 +85,8 @@ class FakeDeviceViewModel(val app: Application) : AndroidViewModel(app) {
 
     private fun loadName(packageName: String): String {
         return try {
-            app.packageManager.getApplicationInfo(packageName, 0).loadLabel(app.packageManager).toString()
+            app.packageManager.getApplicationInfo(packageName, 0).loadLabel(app.packageManager)
+                .toString()
         } catch (e: PackageManager.NameNotFoundException) {
             packageName
         }

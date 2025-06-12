@@ -60,7 +60,10 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
                             navHostController.popBackStack()
                         }
                     ) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "back")
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "back"
+                        )
                     }
                 },
                 title = {
@@ -157,7 +160,14 @@ fun SwitchPreference(
 }
 
 @Composable
-fun Preference(title: String, summary: String? = null, icon: ImageVector?, showDivider: Boolean = false, action: (@Composable () -> Unit)? = null, onClick: () -> Unit) {
+fun Preference(
+    title: String,
+    summary: String? = null,
+    icon: ImageVector?,
+    showDivider: Boolean = false,
+    action: (@Composable () -> Unit)? = null,
+    onClick: () -> Unit
+) {
     Surface(
         modifier = Modifier
             .clickable { onClick() }
@@ -220,7 +230,8 @@ fun Preference(title: String, summary: String? = null, icon: ImageVector?, showD
 @Preview
 @Composable
 fun PreviewSettings() {
-    SwitchPreference("title", "summary",
+    SwitchPreference(
+        "title", "summary",
         Icons.Filled.Android,
         checked = false,
         showDivider = true,

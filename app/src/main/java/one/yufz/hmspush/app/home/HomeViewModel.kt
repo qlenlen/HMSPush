@@ -72,18 +72,30 @@ class HomeViewModel(val app: Application) : AndroidViewModel(app) {
         try {
             app.packageManager.getApplicationInfo(HMS_PACKAGE_NAME, 0)
         } catch (e: PackageManager.NameNotFoundException) {
-            _uiState.value = UiState(false, app.getString(R.string.hms_core_not_found), Reason.HmsCoreNotInstalled)
+            _uiState.value = UiState(
+                false,
+                app.getString(R.string.hms_core_not_found),
+                Reason.HmsCoreNotInstalled
+            )
             return
         }
 
         val moduleVersion = HmsPushClient.moduleVersion
         if (moduleVersion == null) {
-            _uiState.value = UiState(false, app.getString(R.string.hms_not_activated), Reason.HmsCoreNotActivated)
+            _uiState.value = UiState(
+                false,
+                app.getString(R.string.hms_not_activated),
+                Reason.HmsCoreNotActivated
+            )
             return
         }
 
         if (moduleVersion.apiVersion != API_VERSION) {
-            _uiState.value = UiState(false, app.getString(R.string.hms_version_not_match), Reason.HmsPushVersionNotMatch)
+            _uiState.value = UiState(
+                false,
+                app.getString(R.string.hms_version_not_match),
+                Reason.HmsPushVersionNotMatch
+            )
             return
         }
 

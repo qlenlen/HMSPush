@@ -52,7 +52,14 @@ fun SearchBar(
     var showClearButton by remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusRequester = remember { FocusRequester() }
-    val textState = remember { mutableStateOf(TextFieldValue(searchText, selection = TextRange(searchText.length))) }
+    val textState = remember {
+        mutableStateOf(
+            TextFieldValue(
+                searchText,
+                selection = TextRange(searchText.length)
+            )
+        )
+    }
 
     fun clear() {
         textState.value = TextFieldValue()
@@ -68,7 +75,10 @@ fun SearchBar(
     }
     Row {
         Spacer(modifier = Modifier.width(4.dp))
-        IconButton(onClick = ::back, modifier = Modifier.align(alignment = Alignment.CenterVertically)) {
+        IconButton(
+            onClick = ::back,
+            modifier = Modifier.align(alignment = Alignment.CenterVertically)
+        ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Back"

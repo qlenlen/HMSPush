@@ -29,7 +29,7 @@ fun ContentModel.toContentValues(): ContentValues {
 inline fun <reified T : ContentModel> ContentValues.toContent() = toContent(T::class)
 
 fun <T : ContentModel> ContentValues.toContent(type: KClass<T>): T {
-    val model = type.java.newInstance()
+    val model = type.java.getDeclaredConstructor().newInstance()
 
     type.getContentProperties().properties.forEach { (name, prop) ->
         prop.set(model, get(name))

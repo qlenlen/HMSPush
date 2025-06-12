@@ -79,7 +79,10 @@ fun IconScreen(iconViewModel: IconViewModel = viewModel()) {
             TopAppBar(
                 navigationIcon = {
                     IconButton(onClick = { navHostController.popBackStack() }) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
                     }
                 },
                 title = {
@@ -215,7 +218,11 @@ fun IconScreen(iconViewModel: IconViewModel = viewModel()) {
 fun MoreMenu(showMoreMenu: Boolean, onDismissRequest: () -> Unit) {
     var showImportDialog by remember { mutableStateOf(false) }
     val iconViewModel: IconViewModel = viewModel()
-    DropdownMenu(expanded = showMoreMenu, onDismissRequest = onDismissRequest, modifier = Modifier.defaultMinSize(minWidth = 160.dp)) {
+    DropdownMenu(
+        expanded = showMoreMenu,
+        onDismissRequest = onDismissRequest,
+        modifier = Modifier.defaultMinSize(minWidth = 160.dp)
+    ) {
         DropdownMenuItem(
             text = {
                 Text(text = stringResource(id = R.string.import_from_url))

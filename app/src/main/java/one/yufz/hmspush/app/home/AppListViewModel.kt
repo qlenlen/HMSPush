@@ -24,7 +24,13 @@ class AppListViewModel(val context: Application) : AndroidViewModel(context) {
 
     private val historyListFlow = HmsPushClient.getPushHistoryFlow()
 
-    val appListFlow: Flow<List<AppInfo>> = combine(supportedAppList.appListFlow, registeredListFlow, historyListFlow, FakeDeviceConfig.configMapFlow, ::mergeSource)
+    val appListFlow: Flow<List<AppInfo>> = combine(
+        supportedAppList.appListFlow,
+        registeredListFlow,
+        historyListFlow,
+        FakeDeviceConfig.configMapFlow,
+        ::mergeSource
+    )
         .combine(filterKeywords, ::filterAppList)
 
     init {
@@ -42,7 +48,12 @@ class AppListViewModel(val context: Application) : AndroidViewModel(context) {
         }
     }
 
-    private fun mergeSource(appList: List<String>, registered: List<PushSignModel>, history: List<PushHistoryModel>, configMap: ConfigMap): List<AppInfo> {
+    private fun mergeSource(
+        appList: List<String>,
+        registered: List<PushSignModel>,
+        history: List<PushHistoryModel>,
+        configMap: ConfigMap
+    ): List<AppInfo> {
         val pm = context.packageManager
         val registeredSet = registered.map { it.packageName }
         val historyMap = history.associateBy { it.packageName }

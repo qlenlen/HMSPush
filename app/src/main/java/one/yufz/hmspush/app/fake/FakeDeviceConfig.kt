@@ -75,7 +75,11 @@ object FakeDeviceConfig {
             }
             .joinToString("\\n") { it }
 
-        val result = ShellUtil.executeCommand("su", "-c", "mkdir -p \$(dirname $CONFIG_PATH) && echo '$lines' > $CONFIG_PATH")
+        val result = ShellUtil.executeCommand(
+            "su",
+            "-c",
+            "mkdir -p \$(dirname $CONFIG_PATH) && echo '$lines' > $CONFIG_PATH"
+        )
 
         if (result.isSuccess) {
             Log.d(TAG, "writeConfig output=${result.output}")

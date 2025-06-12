@@ -33,7 +33,7 @@ class SupportHmsAppList constructor(private val context: Context) {
                 context.packageManager.queryBroadcastReceivers(
                     intent,
                     PackageManager.MATCH_DISABLED_UNTIL_USED_COMPONENTS
-                            or PackageManager.MATCH_DISABLED_COMPONENTS
+                        or PackageManager.MATCH_DISABLED_COMPONENTS
                 ).map { it.activityInfo.packageName }
             }
             val queryByService = async(Dispatchers.IO) {
@@ -41,7 +41,7 @@ class SupportHmsAppList constructor(private val context: Context) {
                 context.packageManager.queryIntentServices(
                     intent,
                     PackageManager.MATCH_DISABLED_UNTIL_USED_COMPONENTS
-                            or PackageManager.MATCH_DISABLED_COMPONENTS
+                        or PackageManager.MATCH_DISABLED_COMPONENTS
                 ).map { it.serviceInfo.packageName }
             }
             (queryByReceiver.await() + queryByService.await()).distinct()

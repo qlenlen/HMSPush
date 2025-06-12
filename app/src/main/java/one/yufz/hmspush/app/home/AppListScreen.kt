@@ -64,11 +64,13 @@ import one.yufz.hmspush.app.theme.AppTheme
 import one.yufz.hmspush.app.theme.customColors
 import one.yufz.hmspush.common.HMS_PACKAGE_NAME
 import one.yufz.hmspush.common.HmsCoreUtil
-import java.lang.StringBuilder
 
 @Composable
 fun AppListScreen(searchText: String, appListViewModel: AppListViewModel = viewModel()) {
-    val appList: List<AppInfo> by appListViewModel.appListFlow.collectAsState(initial = emptyList(), Dispatchers.IO)
+    val appList: List<AppInfo> by appListViewModel.appListFlow.collectAsState(
+        initial = emptyList(),
+        Dispatchers.IO
+    )
 
     appListViewModel.filter(searchText)
 
@@ -177,11 +179,15 @@ private fun AppStatus(info: AppInfo) {
     val divider = " • "
     val builder = StringBuilder()
 
-    val registerInfo = if (info.registered) stringResource(R.string.registered) else stringResource(R.string.unregistered)
+    val registerInfo =
+        if (info.registered) stringResource(R.string.registered) else stringResource(R.string.unregistered)
     builder.append(registerInfo)
 
     if (info.lastPushTime != null) {
-        val lastPushInfo = stringResource(R.string.latest_push, DateUtils.getRelativeTimeSpanString(info.lastPushTime))
+        val lastPushInfo = stringResource(
+            R.string.latest_push,
+            DateUtils.getRelativeTimeSpanString(info.lastPushTime)
+        )
         builder.append(divider)
         builder.append(lastPushInfo)
     }
@@ -205,7 +211,11 @@ private fun MoreDropdownMenu(expanded: Boolean, info: AppInfo, onDismissRequest:
 
     var showUnregisterDialog by remember { mutableStateOf(false) }
 
-    DropdownMenu(expanded = expanded, onDismissRequest = onDismissRequest, modifier = Modifier.requiredWidth(160.dp)) {
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = onDismissRequest,
+        modifier = Modifier.requiredWidth(160.dp)
+    ) {
         //Launch
         DropdownMenuItem(
             text = {
@@ -242,7 +252,11 @@ private fun MoreDropdownMenu(expanded: Boolean, info: AppInfo, onDismissRequest:
             },
             onClick = {
                 HmsPushClient.clearHmsNotificationChannels(info.packageName)
-                Toast.makeText(context, R.string.clear_hms_notification_channels_done, Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    R.string.clear_hms_notification_channels_done,
+                    Toast.LENGTH_SHORT
+                ).show()
                 onDismissRequest()
             }
         )
@@ -298,7 +312,11 @@ private fun MoreDropdownMenu(expanded: Boolean, info: AppInfo, onDismissRequest:
 }
 
 @Composable
-private fun UnregisterDialog(info: AppInfo, onDismissRequest: () -> Unit, viewModel: AppListViewModel = viewModel()) {
+private fun UnregisterDialog(
+    info: AppInfo,
+    onDismissRequest: () -> Unit,
+    viewModel: AppListViewModel = viewModel()
+) {
     AlertDialog(
         onDismissRequest = onDismissRequest,
         title = {
@@ -331,7 +349,10 @@ private fun UnregisterDialog(info: AppInfo, onDismissRequest: () -> Unit, viewMo
 @Composable
 private fun Preview() {
     val appInfo = AppInfo(
-        packageName = BuildConfig.APPLICATION_ID, lastPushTime = System.currentTimeMillis(), name = stringResource(R.string.app_name), registered = true
+        packageName = BuildConfig.APPLICATION_ID,
+        lastPushTime = System.currentTimeMillis(),
+        name = stringResource(R.string.app_name),
+        registered = true
     )
     val list = listOf(appInfo, appInfo.copy(registered = false))
     AppTheme {
