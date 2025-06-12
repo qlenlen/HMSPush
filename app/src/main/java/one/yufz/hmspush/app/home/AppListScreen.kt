@@ -139,7 +139,7 @@ private fun AppCard(info: AppInfo) {
         var showDropdownMenu by remember { mutableStateOf(false) }
         IconButton(onClick = { showDropdownMenu = true }) {
             Icon(imageVector = Icons.Filled.MoreVert, contentDescription = "More")
-            MoreDropdownMenu(showDropdownMenu, info, { showDropdownMenu = false })
+            MoreDropdownMenu(showDropdownMenu, info) { showDropdownMenu = false }
         }
 
     }
@@ -334,7 +334,7 @@ private fun Preview() {
         packageName = BuildConfig.APPLICATION_ID, lastPushTime = System.currentTimeMillis(), name = stringResource(R.string.app_name), registered = true
     )
     val list = listOf(appInfo, appInfo.copy(registered = false))
-    AppTheme() {
+    AppTheme {
         AppList(list)
     }
 }
