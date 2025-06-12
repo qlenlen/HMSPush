@@ -1,4 +1,8 @@
-@file:OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@file:OptIn(
+    ExperimentalAnimationApi::class,
+    ExperimentalMaterial3Api::class,
+    ExperimentalComposeUiApi::class
+)
 
 package one.yufz.hmspush.app.fake
 
@@ -15,7 +19,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -64,7 +68,10 @@ fun FakeDeviceScreen(viewModel: FakeDeviceViewModel = viewModel()) {
                 scrollBehavior = scrollBehavior,
                 navigationIcon = {
                     IconButton(onClick = { navHostController.popBackStack() }) {
-                        Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
                     }
                 },
                 title = {
@@ -113,8 +120,8 @@ fun FakeDeviceScreen(viewModel: FakeDeviceViewModel = viewModel()) {
 private fun Tips() {
     Icon(
         modifier = Modifier
-            .size(24.dp)
-            .padding(all = 2.dp),
+          .size(24.dp)
+          .padding(all = 2.dp),
         imageVector = Icons.Outlined.Info,
         contentDescription = "tips"
     )
@@ -131,8 +138,8 @@ private fun AppCard(config: AppConfig, onCheckedChange: (checked: Boolean) -> Un
                 contentDescription = "icon",
                 tint = Color.Unspecified,
                 modifier = Modifier
-                    .size(56.dp)
-                    .padding(all = 8.dp)
+                  .size(56.dp)
+                  .padding(all = 8.dp)
             )
         },
         headlineContent = {
